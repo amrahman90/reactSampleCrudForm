@@ -1,17 +1,16 @@
 import React from 'react';
-import imagename from "@/assets/logos/QSMP_RGB.jpg";
 import './App.scss';
+import CurdForm from './CurdForm';
+import CurdOverviewTable from './CurdOverviewTable';
+import { Container } from '@material-ui/core/';
 
 const App: React.FunctionComponent = () => {
   return (
     <>
-    <img src={imagename} /> 
-
-    <div>
-       <p className="hello-text">Hello from react!</p>
-     </div>
-
-    <h1> My React with TypeScript App!! {new Date().toLocaleDateString()}</h1>
+      <Container maxWidth="sm">
+        <CurdForm />
+        <CurdOverviewTable />
+      </Container>
     </>
   )
 };
