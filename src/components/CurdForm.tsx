@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     TextField,
     Checkbox,
@@ -18,8 +18,101 @@ const CurdForm: React.FunctionComponent = () => {
         }
     }
 
+    const [numberOfData, setNumberOfData] = useState(6);
+
+    const [selectValues, setSelectValue] = useState([
+        { currentValue: 'none', id: '0' },
+        { currentValue: 'none', id: '1' },
+        { currentValue: 'none', id: '2' },
+        { currentValue: 'none', id: '3' },
+        { currentValue: 'none', id: '4' },
+        { currentValue: 'none', id: '5' },
+        { currentValue: 'none', id: '6' }
+    ]);
+
+    const [activeSelected, setActiveSelected] = useState([
+        { currentValue: 'none', id: '0' },
+        { currentValue: 'none', id: '1' },
+        { currentValue: 'none', id: '2' },
+        { currentValue: 'none', id: '3' },
+        { currentValue: 'none', id: '4' },
+        { currentValue: 'none', id: '5' },
+        { currentValue: 'none', id: '6' }
+    ]);
+
+    const selectOnChangeHandler = (event: any, selectId: string) => {
+        console.log('debug-event ', event.target.value, event.target.id);
+
+
+        const values = [...activeSelected];
+        const index = parseInt(selectId);
+        const selectValue = event.target.value;
+
+        values[index].currentValue = selectValue;
+        values[index].id = selectId;
+
+        console.log('active select ', values);
+        setActiveSelected(values);
+
+    }
+
+    const selectGenerator = (currentValue: string, selectId: string) => {
+
+        const options = [];
+
+        options.push(
+            <option value={0}>None</option>
+        );
+
+        for (let i = 1; i <= numberOfData; ++i) {
+            options.push(<option key={i} value={i}>{i}</option>);
+        }
+
+        return (
+            <Select
+                native
+                onChange={(e) => selectOnChangeHandler(e, selectId)}
+                defaultValue={currentValue}
+                inputProps={{
+                    name: selectId,
+                    id: selectId,
+                }}
+            >
+                {options}
+
+            </Select>
+
+        );
+    }
+
+
+
+    useEffect(() => {
+
+        const values = [...selectValues];
+
+        activeSelected.forEach((currentSelected, index) => {
+
+            if (currentSelected.currentValue === 'none') {
+                values[index].currentValue = `${index}`;
+                values[index].id = `${index}`;
+            }
+            else {
+                values[index].currentValue = currentSelected.currentValue;
+                values[index].id = currentSelected.id;
+            }
+        });
+
+        setSelectValue(values);
+
+        console.log('inside use effect ', values);
+
+    }, [activeSelected]);
+
+
     const numberOfDataOnChangeHandler = (event: any) => {
-        console.log('debug-event ', event.target.value);
+        setNumberOfData(event.target.value);
+        // console.log('debug-event ', event.target.value);
     }
 
 
@@ -87,18 +180,7 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >DIN ID</p>
-                <Select
-                    native
-                    inputProps={{
-                        name: 'age',
-                        id: 'age-native-simple',
-                    }}
-                >
-                    <option aria-label="None" value="" />
-                    <option value={1}>Ten</option>
-                    <option value={2}>Twenty</option>
-                    <option value={3}>Thirty</option>
-                </Select>
+                {selectGenerator('0', '0')}
                 <Radio
                     style={styles.inlineBlock}
                     value="d"
@@ -114,9 +196,7 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >Fixed ID</p>
-                <TextField
-                    style={styles.inlineBlock}
-                    id="outlined-basic" label="Fixed ID" size="small" />
+                {selectGenerator('0', '1')}
                 <Radio
                     style={styles.inlineBlock}
                     value="d"
@@ -132,9 +212,7 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >Serial ID</p>
-                <TextField
-                    style={styles.inlineBlock}
-                    id="outlined-basic" label="Serial ID" size="small" />
+                {selectGenerator('0', '2')}
 
             </div>
 
@@ -142,9 +220,7 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >Fabrication ID</p>
-                <TextField
-                    style={styles.inlineBlock}
-                    id="outlined-basic" label="Fabrication ID" size="small" />
+                {selectGenerator('0', '3')}
 
             </div>
 
@@ -152,9 +228,7 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >Device ID</p>
-                <TextField
-                    style={styles.inlineBlock}
-                    id="outlined-basic" label="Device ID" size="small" />
+                {selectGenerator('0', '4')}
                 <Radio
                     style={styles.inlineBlock}
                     value="d"
@@ -170,9 +244,7 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >IP ID</p>
-                <TextField
-                    style={styles.inlineBlock}
-                    id="outlined-basic" label="Device ID" size="small" />
+                {selectGenerator('0', '5')}
 
             </div>
 
@@ -182,12 +254,7 @@ const CurdForm: React.FunctionComponent = () => {
                 >
                     DNS ID
                 </p>
-
-                <TextField
-
-                    style={styles.inlineBlock}
-                    id="outlined-basic" label="Device ID" size="small"
-                />
+                {selectGenerator('0', '6')}
             </div>
 
             <div>
