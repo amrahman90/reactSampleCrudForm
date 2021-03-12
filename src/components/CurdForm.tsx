@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import {
     TextField,
     Checkbox,
-    FormControl,
-    RadioGroup,
-    FormControlLabel,
+    Grid,
     Radio,
-    Select
+    Select,
+    Paper,
+    Typography,
+    Button
 } from '@material-ui/core/';
 
 const CurdForm: React.FunctionComponent = () => {
@@ -164,188 +165,242 @@ const CurdForm: React.FunctionComponent = () => {
 
     return (
 
-        <form>
-            <div>
-                <p style={styles.inlineBlock}>
-                    Name of the key
-                </p>
-                <TextField style={{ display: 'inline-block', marginLeft: '10px' }} id="outlined-basic" label="Name of the key" size="small" />
-            </div>
-            <div>
-                <p style={styles.inlineBlock}>Use Fixed ID</p>
-                <Checkbox
-                    checked={true}
-                />
-                <TextField id="outlined-basic" label="ID Code" size="small" />
-            </div>
-            <div>
-                <p
-                    style={styles.inlineBlock}
-                >Header Line</p>
-                <Radio
-                    style={styles.inlineBlock}
-                    value="d"
-                    color="default"
-                    name="radio-button-demo"
-                    inputProps={{ 'aria-label': 'D' }}
-                />
+        <div style={{ marginTop: '100px' }}>
+            <Grid container spacing={3}>
+                <Grid item xs={3} >
+                    <Typography>Name of the key</Typography>
+                </Grid>
+                <Grid item xs={9} >
+                    <TextField id="outlined-basic" label="Name of the key" size="small" />
+                </Grid>
+                <Grid item xs={3} >
+                    <Typography>Use Fixed ID</Typography>
+                </Grid>
+                <Grid item xs={1} >
+                    <Checkbox
+                        checked={true}
+                    />
+                </Grid>
+                <Grid item xs={7} >
+                    <TextField id="outlined-basic" label="ID Code" size="small" />
+                </Grid>
 
-                <Radio
-                    style={styles.inlineBlock}
-                    value="d"
-                    color="default"
-                    name="radio-button-demo"
-                    inputProps={{ 'aria-label': 'D' }}
-                />
-            </div>
+                {/* Third Row */}
 
-            <div>
-                <p style={styles.inlineBlock}>Separator Style</p>
-                <div style={{ display: 'inline-block', marginLeft: '10px' }}>
-                    <button>A</button>
-                    <button>B</button>
-                    <button>C</button>
-                    <button>D</button>
-                </div>
+                <Grid item xs={3} >
+                    <Typography>Header Line</Typography>
+                </Grid>
+                <Grid item xs={1} >
+                    <Radio
+                        value="d"
+                        color="default"
+                        name="radio-button-demo"
+                        inputProps={{ 'aria-label': 'D' }}
+                    />
+                </Grid>
+                <Grid item xs={8} >
 
-            </div>
+                    <Radio
+                        value="d"
+                        color="default"
+                        name="radio-button-demo"
+                        inputProps={{ 'aria-label': 'D' }}
+                    />
+                </Grid>
 
-            <div>
-                <p style={styles.inlineBlock}>Number of Data</p>
-                <TextField
-                    onChange={numberOfDataOnChangeHandler}
-                    size="small"
-                    defaultValue={6}
-                    InputProps={{ inputProps: { min: 1, max: 7 } }}
-                    style={{ display: 'inline-block', marginLeft: '10px' }}
-                    type="number"
-                />
-            </div>
+                {/* Fourth Row */}
+                <Grid item xs={3} >
+                    <Typography>Separator Style</Typography>
+                </Grid>
 
-            <div>
-                <p
-                    style={styles.inlineBlock}
-                >DIN ID</p>
-                {
-                    selectValues[0] !== undefined
-                        ?
-                        selectGenerator(selectValues[0].currentValue, '0')
-                        :
-                        selectGenerator('0', '0')
-                }
-                <Checkbox
-                    checked={true}
-                />
+                <Grid item xs={9} >
+                    <div>
+                        <button>A</button>
+                        <button>B</button>
+                        <button>C</button>
+                        <button>D</button>
+                    </div>
 
-                <p style={styles.inlineBlock}>Fabrication ID included</p>
+                </Grid>
 
-            </div>
+                {/* Fifth Row */}
 
-            <div>
-                <p
-                    style={styles.inlineBlock}
-                >Fixed ID</p>
-                {
-                    selectValues[1] !== undefined
-                        ?
-                        selectGenerator(selectValues[1].currentValue, '1')
-                        :
-                        selectGenerator('0', '1')
-                }
-                <Checkbox
-                    checked={true}
-                />
-                <p style={styles.inlineBlock}>Serial ID included</p>
+                <Grid item xs={3} >
+                    <Typography>Number of Data</Typography>
+                </Grid>
 
-            </div>
+                <Grid item xs={9} >
+                    <TextField
+                        onChange={numberOfDataOnChangeHandler}
+                        size="small"
+                        defaultValue={6}
+                        InputProps={{ inputProps: { min: 1, max: 7 } }}
+                        // style={{ marginLeft: '10px' }}
+                        type="number"
+                    />
 
-            <div>
-                <p
-                    style={styles.inlineBlock}
-                >Serial ID</p>
-                {
-                    selectValues[2] !== undefined
-                        ?
-                        selectGenerator(selectValues[2].currentValue, '2')
-                        :
-                        selectGenerator('0', '2')
-                }
+                </Grid>
 
-            </div>
+                {/* Sixth Row */}
 
-            <div>
-                <p
-                    style={styles.inlineBlock}
-                >Fabrication ID</p>
-                {
-                    selectValues[3] !== undefined
-                        ?
-                        selectGenerator(selectValues[3].currentValue, '3')
-                        :
-                        selectGenerator('0', '3')
-                }
+                <Grid item xs={3} >
+                    <Typography>DIN ID</Typography>
+                </Grid>
+                <Grid item xs={3} >
+                    {
+                        selectValues[0] !== undefined
+                            ?
+                            selectGenerator(selectValues[0].currentValue, '0')
+                            :
+                            selectGenerator('0', '0')
+                    }
+                </Grid>
 
-            </div>
+                <Grid item xs={1} >
+                    <Checkbox
+                        checked={true}
+                    />
+                </Grid>
 
-            <div>
-                <p
-                    style={styles.inlineBlock}
-                >Device ID</p>
-                {
-                    selectValues[4] !== undefined
-                        ?
-                        selectGenerator(selectValues[4].currentValue, '4')
-                        :
-                        selectGenerator('0', '4')
-                }
-                <Checkbox
-                    checked={true}
-                />
-                <p style={styles.inlineBlock}>DNS ID included</p>
 
-            </div>
+                <Grid item xs={5} >
+                    <Typography>Fabrication ID included</Typography>
+                </Grid>
 
-            <div>
-                <p
-                    style={styles.inlineBlock}
-                >IP ID</p>
-                {
-                    selectValues[5] !== undefined
-                        ?
-                        selectGenerator(selectValues[5].currentValue, '5')
-                        :
-                        selectGenerator('0', '5')
-                }
 
-            </div>
+                {/* Seventh Row  */}
 
-            <div>
-                <p
-                    style={styles.inlineBlock}
+                <Grid item xs={3} >
+                    <Typography>Fixed ID</Typography>
+                </Grid>
+
+                <Grid item xs={3} >
+                    {
+                        selectValues[1] !== undefined
+                            ?
+                            selectGenerator(selectValues[1].currentValue, '1')
+                            :
+                            selectGenerator('0', '1')
+                    }
+                </Grid>
+
+                <Grid item xs={1} >
+                    <Checkbox
+                        checked={true}
+                    />
+                </Grid>
+
+                <Grid item xs={5} >
+                    <Typography>Serial ID included</Typography>
+                </Grid>
+
+                {/* Eighth Row  */}
+
+                <Grid item xs={3} >
+                    <Typography>Serial ID</Typography>
+                </Grid>
+
+                <Grid item xs={9} >
+                    {
+                        selectValues[2] !== undefined
+                            ?
+                            selectGenerator(selectValues[2].currentValue, '2')
+                            :
+                            selectGenerator('0', '2')
+                    }
+                </Grid>
+
+                {/* Ninth Row  */}
+
+                <Grid item xs={3} >
+                    <p
+                        style={styles.inlineBlock}
+                    >Fabrication ID</p>
+
+
+                </Grid>
+                <Grid item xs={9} >
+                    {
+                        selectValues[3] !== undefined
+                            ?
+                            selectGenerator(selectValues[3].currentValue, '3')
+                            :
+                            selectGenerator('0', '3')
+                    }
+                </Grid>
+
+                {/* Tenth Row */}
+
+                <Grid item xs={3} >
+                    <Typography>Device ID</Typography>
+                </Grid>
+
+                <Grid item xs={3} >
+                    {
+                        selectValues[4] !== undefined
+                            ?
+                            selectGenerator(selectValues[4].currentValue, '4')
+                            :
+                            selectGenerator('0', '4')
+                    }
+                </Grid>
+
+                <Grid item xs={1} >
+                    <Checkbox
+                        checked={true}
+                    />
+                </Grid>
+
+                <Grid item xs={5} >
+                    <Typography>DNS ID Included</Typography>
+                </Grid>
+
+                {/* Eleventh Row  */}
+
+                <Grid item xs={3} >
+                    <Typography>IP ID</Typography>
+                </Grid>
+
+                <Grid item xs={9} >
+                    {
+                        selectValues[5] !== undefined
+                            ?
+                            selectGenerator(selectValues[5].currentValue, '5')
+                            :
+                            selectGenerator('0', '5')
+                    }
+                </Grid>
+
+                {/* twelfth Row  */}
+
+                <Grid item xs={3} >
+                    <Typography>DNS ID</Typography>
+                </Grid>
+
+                <Grid item xs={9} >
+                    {
+                        selectValues[6] !== undefined
+                            ?
+                            selectGenerator(selectValues[6].currentValue, '6')
+                            :
+                            selectGenerator('0', '6')
+                    }
+                </Grid>
+
+                <Grid
+                    item xs={6}
+                    direction="row"
+                    alignItems="flex-end" justify="flex-end"
                 >
-                    DNS ID
-                </p>
+                    <Button variant="contained" color="primary">Save</Button>
+                </Grid>
 
-                {
-                    selectValues[6] !== undefined
-                        ?
-                        selectGenerator(selectValues[6].currentValue, '6')
-                        :
-                        selectGenerator('0', '6')
-                }
-            </div>
+                <Grid item xs={6}>
+                    <Button variant="contained" color="primary">Cancel</Button>
+                </Grid>
 
-            <div>
-                <button>
-                    Save
-                </button>
-                <button>
-                    Cancel
-                </button>
-            </div>
-
-        </form>
-
+            </Grid>
+        </div>
     );
 }
 
