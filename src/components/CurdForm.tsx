@@ -20,25 +20,19 @@ const CurdForm: React.FunctionComponent = () => {
 
     const [numberOfData, setNumberOfData] = useState(6);
 
-    const [selectValues, setSelectValue] = useState([
-        { currentValue: 'none', id: '0' },
-        { currentValue: 'none', id: '1' },
-        { currentValue: 'none', id: '2' },
-        { currentValue: 'none', id: '3' },
-        { currentValue: 'none', id: '4' },
-        { currentValue: 'none', id: '5' },
-        { currentValue: 'none', id: '6' }
-    ]);
+    const [selectValues, setSelectValue] = useState<Array<{ currentValue: string, id: string }>>([]);
 
     const [activeSelected, setActiveSelected] = useState([
-        { currentValue: 'none', id: '0' },
-        { currentValue: 'none', id: '1' },
-        { currentValue: 'none', id: '2' },
-        { currentValue: 'none', id: '3' },
-        { currentValue: 'none', id: '4' },
-        { currentValue: 'none', id: '5' },
-        { currentValue: 'none', id: '6' }
+        { currentValue: '0', id: '0' },
+        { currentValue: '0', id: '1' },
+        { currentValue: '0', id: '2' },
+        { currentValue: '0', id: '3' },
+        { currentValue: '0', id: '4' },
+        { currentValue: '0', id: '5' },
+        { currentValue: '0', id: '6' }
     ]);
+
+    // const [selectLookUp, setSelectLookUp] = useState(new Map());
 
     const selectOnChangeHandler = (event: any, selectId: string) => {
         console.log('debug-event ', event.target.value, event.target.id);
@@ -53,6 +47,10 @@ const CurdForm: React.FunctionComponent = () => {
 
         console.log('active select ', values);
         setActiveSelected(values);
+
+        // pushing the selected value for looking up in a constant time in Hashmap
+
+        // setSelectLookUp(selectLookUp.set(selectValue, true));
 
     }
 
@@ -72,7 +70,8 @@ const CurdForm: React.FunctionComponent = () => {
             <Select
                 native
                 onChange={(e) => selectOnChangeHandler(e, selectId)}
-                defaultValue={currentValue}
+                // defaultValue={currentValue}
+                value={currentValue}
                 inputProps={{
                     name: selectId,
                     id: selectId,
@@ -89,30 +88,77 @@ const CurdForm: React.FunctionComponent = () => {
 
     useEffect(() => {
 
-        const values = [...selectValues];
+        const values: Array<{ currentValue: string, id: string }> = [];
+        const selectLookUp = new Map();
 
-        activeSelected.forEach((currentSelected, index) => {
+        //First get the user inputted select values
 
-            if (currentSelected.currentValue === 'none') {
-                values[index].currentValue = `${index}`;
-                values[index].id = `${index}`;
+        let userSelected = 0;
+
+        activeSelected.forEach((current, idx) => {
+
+            if (current.currentValue !== '0') {
+                values[idx] = { currentValue: current.currentValue, id: current.id };
+                selectLookUp.set(current.currentValue, true);
+                userSelected++;
             }
             else {
-                values[index].currentValue = currentSelected.currentValue;
-                values[index].id = currentSelected.id;
+                values[idx] = { currentValue: '0', id: current.id };
             }
         });
 
+        // getting rest of the numbers
+
+        const restOfValues: Array<string> = [];
+
+        if (userSelected < numberOfData) {
+
+            const remainingSelection = numberOfData - userSelected;
+
+            let counter = 0;
+
+            for (let i = 1; i <= 7; ++i) {
+                if (!selectLookUp.has(`${i}`) && (counter < remainingSelection)) {
+                    restOfValues.push(`${i}`);
+                    counter++;
+                }
+            }
+        }
+
+        let index = 0;
+
+        if (restOfValues.length > 0 && selectLookUp.size > 0) {
+            values.forEach((current, idx) => {
+                if (current.currentValue === '0') {
+                    values[idx] = { currentValue: restOfValues[index], id: current.id };
+                    index++;
+                    // console.log('values ', current.currentValue);
+                }
+            });
+        }
+
         setSelectValue(values);
 
-        console.log('inside use effect ', values);
+        // console.log('inside use effect ', values);
+        // console.log('select look up ', selectLookUp);
+        // console.log('rem ', restOfValues);
 
-    }, [activeSelected]);
+
+    }, [activeSelected, numberOfData]);
 
 
     const numberOfDataOnChangeHandler = (event: any) => {
         setNumberOfData(event.target.value);
-        // console.log('debug-event ', event.target.value);
+
+        setActiveSelected([
+            { currentValue: '0', id: '0' },
+            { currentValue: '0', id: '1' },
+            { currentValue: '0', id: '2' },
+            { currentValue: '0', id: '3' },
+            { currentValue: '0', id: '4' },
+            { currentValue: '0', id: '5' },
+            { currentValue: '0', id: '6' }
+        ]);
     }
 
 
@@ -180,14 +226,17 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >DIN ID</p>
-                {selectGenerator('0', '0')}
-                <Radio
-                    style={styles.inlineBlock}
-                    value="d"
-                    color="default"
-                    name="radio-button-demo"
-                    inputProps={{ 'aria-label': 'D' }}
+                {
+                    selectValues[0] !== undefined
+                        ?
+                        selectGenerator(selectValues[0].currentValue, '0')
+                        :
+                        selectGenerator('0', '0')
+                }
+                <Checkbox
+                    checked={true}
                 />
+
                 <p style={styles.inlineBlock}>Fabrication ID included</p>
 
             </div>
@@ -196,13 +245,15 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >Fixed ID</p>
-                {selectGenerator('0', '1')}
-                <Radio
-                    style={styles.inlineBlock}
-                    value="d"
-                    color="default"
-                    name="radio-button-demo"
-                    inputProps={{ 'aria-label': 'D' }}
+                {
+                    selectValues[1] !== undefined
+                        ?
+                        selectGenerator(selectValues[1].currentValue, '1')
+                        :
+                        selectGenerator('0', '1')
+                }
+                <Checkbox
+                    checked={true}
                 />
                 <p style={styles.inlineBlock}>Serial ID included</p>
 
@@ -212,7 +263,13 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >Serial ID</p>
-                {selectGenerator('0', '2')}
+                {
+                    selectValues[2] !== undefined
+                        ?
+                        selectGenerator(selectValues[2].currentValue, '2')
+                        :
+                        selectGenerator('0', '2')
+                }
 
             </div>
 
@@ -220,7 +277,13 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >Fabrication ID</p>
-                {selectGenerator('0', '3')}
+                {
+                    selectValues[3] !== undefined
+                        ?
+                        selectGenerator(selectValues[3].currentValue, '3')
+                        :
+                        selectGenerator('0', '3')
+                }
 
             </div>
 
@@ -228,13 +291,15 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >Device ID</p>
-                {selectGenerator('0', '4')}
-                <Radio
-                    style={styles.inlineBlock}
-                    value="d"
-                    color="default"
-                    name="radio-button-demo"
-                    inputProps={{ 'aria-label': 'D' }}
+                {
+                    selectValues[4] !== undefined
+                        ?
+                        selectGenerator(selectValues[4].currentValue, '4')
+                        :
+                        selectGenerator('0', '4')
+                }
+                <Checkbox
+                    checked={true}
                 />
                 <p style={styles.inlineBlock}>DNS ID included</p>
 
@@ -244,7 +309,13 @@ const CurdForm: React.FunctionComponent = () => {
                 <p
                     style={styles.inlineBlock}
                 >IP ID</p>
-                {selectGenerator('0', '5')}
+                {
+                    selectValues[5] !== undefined
+                        ?
+                        selectGenerator(selectValues[5].currentValue, '5')
+                        :
+                        selectGenerator('0', '5')
+                }
 
             </div>
 
@@ -254,7 +325,14 @@ const CurdForm: React.FunctionComponent = () => {
                 >
                     DNS ID
                 </p>
-                {selectGenerator('0', '6')}
+
+                {
+                    selectValues[6] !== undefined
+                        ?
+                        selectGenerator(selectValues[6].currentValue, '6')
+                        :
+                        selectGenerator('0', '6')
+                }
             </div>
 
             <div>
