@@ -9,22 +9,31 @@ const CurdForm: React.FunctionComponent = () => {
     },
   };
 
-  const [numberOfData, setNumberOfData] = useState(6);
+  //Regex for alphabets
 
-  //   const [valueToSelectId, setValueToSelectId] = useState(new Map());
+  const alphabetsRegex = /^[A-Za-z]+$/;
+
+
+  const [nameOfTheKey, setNameOfTheKey] = useState();
+  const [isNameOfKeyHasError, setIsNameOfKeyHasError] = useState(false);
+
+  const nameOfKeyChange = (event: any) => {
+
+
+    console.log('name of key ', event.target.value);
+  };
+
+
+  const [numberOfData, setNumberOfData] = useState(6);
   const [selectIdToValue, setSelectIdToValue] = useState(new Map());
 
   const selectOnChangeHandler = (event: any, selectId: string) => {
-    //     console.log('debug-event ', event.target.value, event.target.id);
-    // setValueToSelectId(new Map(valueToSelectId.set(event.target.value, selectId)));
     setSelectIdToValue(new Map(selectIdToValue.set(selectId, event.target.value)));
-
   };
 
-  useEffect(() => {
-    // console.log('value to select ', valueToSelectId);
-    console.log('selectId to value ', selectIdToValue);
-  }, [selectIdToValue]);
+  // useEffect(() => {
+  //   console.log('selectId to value ', selectIdToValue);
+  // }, [selectIdToValue]);
 
   const selectOptions = (selectId: string) => {
     const options = [];
@@ -93,7 +102,27 @@ const CurdForm: React.FunctionComponent = () => {
           <Typography>Name of the key</Typography>
         </Grid>
         <Grid item xs={9}>
-          <TextField id="outlined-basic" label="Name of the key" size="small" />
+          <TextField
+            value={nameOfTheKey}
+            onChange={nameOfKeyChange}
+            error={true}
+            InputProps={{
+              inputProps: {
+                min: 1,
+                max: 7,
+                onKeyDown: (event) => {
+                  if(!event.key.match(alphabetsRegex)){
+                    event.preventDefault();
+                    // console.log('true');
+                  }
+                  // console.log('onl key down ', event.key);
+                },
+              },
+            }}
+            id="outlined-basic"
+            label="Name of the key"
+            size="small"
+          />
         </Grid>
         <Grid item xs={3}>
           <Typography>Use Fixed ID</Typography>
