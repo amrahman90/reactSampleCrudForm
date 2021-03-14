@@ -10,7 +10,8 @@ const App: React.FunctionComponent = () => {
     <>
       <MaterialAppBar />
       <Container maxWidth="sm">
-        <CurdForm />
+        <CurdForm
+        />
         <CurdOverviewTable />
       </Container>
     </>

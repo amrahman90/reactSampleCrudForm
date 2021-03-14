@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Checkbox, Grid, Radio, Select, Paper, Typography, Button } from '@material-ui/core/';
+import { TextField, Checkbox, Grid, Select, Typography, Button } from '@material-ui/core/';
+import { getRandomString } from '../Helper/HelperFunctions';
 
-const CurdForm: React.FunctionComponent = () => {
+interface props {
+  id?: number;
+}
+
+function CurdForm(props: props) {
   const styles = {
     inlineBlock: {
       display: 'inline-block',
       marginRight: '10px',
     },
   };
+
+  const [errorsFromValidation, setErrorsFromValidation] = useState([]);
+
+  const { id } = props;
 
   const [numberOfData, setNumberOfData] = useState(6);
   const [selectIdToValue, setSelectIdToValue] = useState(new Map());
@@ -16,20 +25,38 @@ const CurdForm: React.FunctionComponent = () => {
 
   const alphabetsRegex = /^[A-Za-z]+$/;
 
+  // Lookup table for ID included fields
+
+  const [includedFieldsLookup, setIncludedFieldsLookup] = useState(new Map());
+
+  const addKeyToIncludedFieldsLookup = (key: string, value1: string, value2: string) => {
+    setIncludedFieldsLookup(
+      new Map(includedFieldsLookup.set(key, `${selectIdToValue.get(value1)} & ${selectIdToValue.get(value2)}`))
+    );
+  };
+
+  const deleteKeyFromIncludedFieldsLookup = (key: string) => {
+    setIncludedFieldsLookup((prev) => {
+      const newState = new Map(prev);
+      newState.delete(key);
+      return newState;
+    });
+  };
+
   // Name of the key
-  const [nameOfTheKey, setNameOfTheKey] = useState();
+  const [nameOfTheKey, setNameOfTheKey] = useState('');
   const [isNameOfKeyHasError, setIsNameOfKeyHasError] = useState(false);
   //Use Fixed ID
   const [isFixedIdChecked, setIsFixedIdChecked] = useState(false);
-  const [fixedIdCode, setFixedIdCode] = useState();
+  const [fixedIdCode, setFixedIdCode] = useState('');
 
   //Header Line
 
-  const [headerLine, setHeaderLine] = useState("yes");
+  const [headerLine, setHeaderLine] = useState('yes');
 
   //Separator Style
 
-  const [separatorStyle, setSeparatorStyle] = useState('');
+  const [separatorStyle, setSeparatorStyle] = useState('A');
 
   // Is Fabrication ID included
 
@@ -46,9 +73,12 @@ const CurdForm: React.FunctionComponent = () => {
   const [isDisabledDNSIdIncluded, setIsDisabledDNSIdIncluded] = useState(true);
   const [isDNSIdChecked, setIsDNSIdChecked] = useState(false);
 
-
-  const nameOfKeyChange = (event: any) => {
-    console.log('name of key ', event.target.value);
+  const textFieldChange = (event: any, title: string) => {
+    if (title === 'nameofkey') {
+      setNameOfTheKey(event.target.value);
+    } else if (title === 'usefixedid') {
+      setFixedIdCode(event.target.value);
+    }
   };
 
   const selectOnChangeHandler = (event: any, selectId: string) => {
@@ -56,36 +86,66 @@ const CurdForm: React.FunctionComponent = () => {
   };
 
   useEffect(() => {
+    console.log('included fields lookups ', includedFieldsLookup);
+  }, [includedFieldsLookup]);
 
-    //When fabrication ID has got changed
+  //When fabrication id included button checked or unchecked
 
-    if (selectIdToValue.has('4') && selectIdToValue.get('4') !== '0') {
-      setIsDisabledFabricationIdIncluded(false);
+  useEffect(() => {
+    if (isFabricationIdChecked) {
+      addKeyToIncludedFieldsLookup('1', '1', '4');
+      setSelectIdToValue(new Map(selectIdToValue.set('4', '0')));
+    } else {
+      deleteKeyFromIncludedFieldsLookup('1');
     }
-    else {
+  }, [isFabricationIdChecked]);
+
+  // When Serial id included button checked or unchecked
+
+  useEffect(() => {
+    if (isSerialIdChecked) {
+      addKeyToIncludedFieldsLookup('2', '2', '3');
+      setSelectIdToValue(new Map(selectIdToValue.set('3', '0')));
+    } else {
+      deleteKeyFromIncludedFieldsLookup('2');
+    }
+  }, [isSerialIdChecked]);
+
+  // When DNS Id included button checked or unchecked
+
+  useEffect(() => {
+    if (isDNSIdChecked) {
+      addKeyToIncludedFieldsLookup('3', '5', '7');
+      setSelectIdToValue(new Map(selectIdToValue.set('7', '0')));
+    } else {
+      deleteKeyFromIncludedFieldsLookup('3');
+    }
+  }, [isDNSIdChecked]);
+
+  //When fabrication ID has got changed
+
+  useEffect(() => {
+    if (selectIdToValue.has('1') && selectIdToValue.get('1') !== '0') {
+      setIsDisabledFabricationIdIncluded(false);
+    } else {
       setIsDisabledFabricationIdIncluded(true);
     }
 
     // When serial ID has got changed
 
-    if (selectIdToValue.has('3') && selectIdToValue.get('3') !== '0') {
+    if (selectIdToValue.has('2') && selectIdToValue.get('2') !== '0') {
       setIsDisabledSerialIdIncluded(false);
-    }
-    else {
+    } else {
       setIsDisabledSerialIdIncluded(true);
     }
 
     //When DNS ID has got changed
 
-
-    if (selectIdToValue.has('7') && selectIdToValue.get('7') !== '0') {
+    if (selectIdToValue.has('5') && selectIdToValue.get('5') !== '0') {
       setIsDisabledDNSIdIncluded(false);
-    }
-    else {
+    } else {
       setIsDisabledDNSIdIncluded(true);
     }
-
-
   }, [selectIdToValue]);
 
   const selectOptions = (selectId: string) => {
@@ -115,7 +175,7 @@ const CurdForm: React.FunctionComponent = () => {
 
     availableOptions.sort();
 
-    console.log('availableOptions ', availableOptions);
+    // console.log('availableOptions ', availableOptions);
 
     options.push(
       <option key={0} value={0}>
@@ -138,18 +198,105 @@ const CurdForm: React.FunctionComponent = () => {
     selectIdToValue.forEach((entry, key) => {
       setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
     });
+
+    setIsFabricationIdChecked(false);
+    setIsSerialIdChecked(false);
+    setIsDNSIdChecked(false);
+
+    includedFieldsLookup.forEach((entry, key) => {
+      setIncludedFieldsLookup((prev) => {
+        const newState = new Map(prev);
+        newState.delete(key);
+        return newState;
+      });
+    });
   }, [numberOfData]);
 
   const numberOfDataOnChangeHandler = (event: any) => {
     setNumberOfData(event.target.value);
 
-    selectIdToValue.forEach((entry, key) => {
-      setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
+    // selectIdToValue.forEach((entry, key) => {
+    //   setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
+    // });
+  };
+
+  const ValidateAllFields = () => {
+    const errors = [];
+
+    if (nameOfTheKey === '') {
+      errors.push('Name of Key cannot be empty');
+    }
+
+    if (isFixedIdChecked && fixedIdCode === '') {
+      errors.push('Fixed ID field cannot be empty');
+    }
+
+    let numberOfActiveFields = 0;
+
+    selectIdToValue.forEach((value, id) => {
+      if (value !== '0') {
+        numberOfActiveFields++;
+      }
+
+      console.log('validating ', id, value);
     });
+
+    const numberOfIDIncludedFields = includedFieldsLookup.size;
+
+    if (numberOfActiveFields < 2 && numberOfIDIncludedFields === 0) {
+      errors.push(
+        'Two or more select fields should be selected or at least one ID included checkbox should be selected'
+      );
+    }
+
+    if (errors.length === 0) {
+      console.log('Yay there is no errors!!!');
+
+      console.log('props id ', id);
+
+      const selectIdValues = function () {
+        const entries: Array<{ id: string; value: string }> = [];
+        selectIdToValue.forEach((entry, key) => {
+          entries.push({
+            id: key,
+            value: entry,
+          });
+        });
+
+        return entries;
+      };
+
+      const numbersOfIdIncluded = function () {
+        const entries: Array<{ id: string; value: string }> = [];
+        includedFieldsLookup.forEach((entry, key) => {
+          entries.push({
+            id: key,
+            value: entry,
+          });
+        });
+      };
+
+      const jsonData = {
+        nameofkey: nameOfTheKey,
+        usefixedid: isFixedIdChecked ? fixedIdCode : getRandomString(3),
+        headerline: headerLine,
+        separatorstyle: separatorStyle,
+        numberofdata: numberOfData,
+        selectidvalue: selectIdValues,
+        numberofidincludedfields: numbersOfIdIncluded,
+      };
+
+
+      localStorage.setItem('curdFormData', JSON.stringify(jsonData));
+    } else {
+      console.log('got some errors !!!');
+      // setErrorsFromValidation(errors);
+      console.log(errors);
+    }
   };
 
   return (
-    <div style={{ marginTop: '100px' }}>
+    <form style={{ marginTop: '100px' }}>
       <Grid container spacing={3}>
         <Grid item xs={3}>
           <Typography>Name of the key</Typography>
@@ -157,7 +304,7 @@ const CurdForm: React.FunctionComponent = () => {
         <Grid item xs={9}>
           <TextField
             value={nameOfTheKey}
-            onChange={nameOfKeyChange}
+            onChange={(e) => textFieldChange(e, 'nameofkey')}
             error={isNameOfKeyHasError}
             InputProps={{
               inputProps: {
@@ -170,8 +317,8 @@ const CurdForm: React.FunctionComponent = () => {
               },
             }}
             id="outlined-basic"
-            label={"Name of the key"}
-            helperText={isNameOfKeyHasError ? "Cannot be empty" : null}
+            label={'Name of the key'}
+            helperText={isNameOfKeyHasError ? 'Cannot be empty' : null}
             size="small"
           />
         </Grid>
@@ -179,17 +326,30 @@ const CurdForm: React.FunctionComponent = () => {
           <Typography>Use Fixed ID</Typography>
         </Grid>
         <Grid item xs={1}>
-          <Checkbox onClick={() => {
-            setIsFixedIdChecked(!isFixedIdChecked);
-          }} checked={isFixedIdChecked} />
+          <Checkbox
+            onClick={() => {
+              setIsFixedIdChecked(!isFixedIdChecked);
+            }}
+            checked={isFixedIdChecked}
+          />
         </Grid>
         <Grid item xs={7}>
           <TextField
-            disabled={isFixedIdChecked ? true : false}
+            onChange={(e) => textFieldChange(e, 'usefixedid')}
+            disabled={isFixedIdChecked ? false : true}
             id="outlined-basic"
-            inputProps={{ maxLength: 3 }}
+            inputProps={{
+              maxLength: 3,
+              style: { textTransform: 'uppercase' },
+              onKeyDown: (event) => {
+                if (!event.key.match(alphabetsRegex)) {
+                  event.preventDefault();
+                }
+              },
+            }}
             label="ID Code"
-            size="small" />
+            size="small"
+          />
         </Grid>
 
         {/* Third Row */}
@@ -204,7 +364,6 @@ const CurdForm: React.FunctionComponent = () => {
               onChange={(e) => {
                 setHeaderLine(e.target.value);
               }}
-
               type="radio"
               id="radioYes"
               name="headerLine"
@@ -220,7 +379,8 @@ const CurdForm: React.FunctionComponent = () => {
               type="radio"
               id="radioNo"
               name="headerLine"
-              value="no"></input>
+              value="no"
+            ></input>
             <label htmlFor="radioNo">No</label>
           </div>
         </Grid>
@@ -232,34 +392,56 @@ const CurdForm: React.FunctionComponent = () => {
 
         <Grid item xs={9}>
           <div className="radio-toolbar-separator">
-            <input onChange={(e) => {
-              setSeparatorStyle(e.target.value);
-              console.log('header line radio ', e.target.value);
-            }}
-              type="radio" id="a" name="SeparatorStyle" value="A"></input>
+            <input
+              onChange={(e) => {
+                setSeparatorStyle(e.target.value);
+                console.log('header line radio ', e.target.value);
+              }}
+              type="radio"
+              id="a"
+              defaultChecked={true}
+              name="SeparatorStyle"
+              value="A"
+            ></input>
             <label htmlFor="a">A</label>
 
-            <input onChange={(e) => {
-              setSeparatorStyle(e.target.value);
+            <input
+              onChange={(e) => {
+                setSeparatorStyle(e.target.value);
 
-              console.log('header line radio ', e.target.value);
-            }}
-              type="radio" id="b" name="SeparatorStyle" value="B"></input>
+                console.log('header line radio ', e.target.value);
+              }}
+              type="radio"
+              id="b"
+              name="SeparatorStyle"
+              value="B"
+            ></input>
             <label htmlFor="b">B</label>
 
-            <input onChange={(e) => {
-              setSeparatorStyle(e.target.value);
+            <input
+              onChange={(e) => {
+                setSeparatorStyle(e.target.value);
 
-              console.log('header line radio ', e.target.value);
-            }}
-              type="radio" id="c" name="SeparatorStyle" value="C"></input>
+                console.log('header line radio ', e.target.value);
+              }}
+              type="radio"
+              id="c"
+              name="SeparatorStyle"
+              value="C"
+            ></input>
             <label htmlFor="c">C</label>
 
-            <input onChange={(e) => {
-              setSeparatorStyle(e.target.value);
+            <input
+              onChange={(e) => {
+                setSeparatorStyle(e.target.value);
 
-              console.log('header line radio ', e.target.value);
-            }} type="radio" id="d" name="SeparatorStyle" value="D"></input>
+                console.log('header line radio ', e.target.value);
+              }}
+              type="radio"
+              id="d"
+              name="SeparatorStyle"
+              value="D"
+            ></input>
             <label htmlFor="d">D</label>
           </div>
         </Grid>
@@ -315,7 +497,8 @@ const CurdForm: React.FunctionComponent = () => {
               setIsFabricationIdChecked(!isFabricationIdChecked);
             }}
             checked={isFabricationIdChecked}
-            disabled={isDisabledFabricationIdIncluded} />
+            disabled={isDisabledFabricationIdIncluded}
+          />
         </Grid>
 
         <Grid item xs={5}>
@@ -349,7 +532,8 @@ const CurdForm: React.FunctionComponent = () => {
               setIsSerialIdChecked(!isSerialIdChecked);
             }}
             checked={isSerialIdChecked}
-            disabled={isDisabledSerialIdIncluded} />
+            disabled={isDisabledSerialIdIncluded}
+          />
         </Grid>
 
         <Grid item xs={5}>
@@ -424,7 +608,8 @@ const CurdForm: React.FunctionComponent = () => {
               setIsDNSIdChecked(!isDNSIdChecked);
             }}
             checked={isDNSIdChecked}
-            disabled={isDisabledDNSIdIncluded} />
+            disabled={isDisabledDNSIdIncluded}
+          />
         </Grid>
 
         <Grid item xs={5}>
@@ -474,7 +659,7 @@ const CurdForm: React.FunctionComponent = () => {
         </Grid>
 
         <Grid item xs={6}>
-          <Button variant="contained" color="primary">
+          <Button onClick={() => ValidateAllFields()} variant="contained" color="primary">
             Save
           </Button>
         </Grid>
@@ -485,8 +670,12 @@ const CurdForm: React.FunctionComponent = () => {
           </Button>
         </Grid>
       </Grid>
-    </div>
+
+      <Grid item xs={12}>
+        {errorsFromValidation}
+      </Grid>
+    </form>
   );
-};
+}
 
 export default CurdForm;
