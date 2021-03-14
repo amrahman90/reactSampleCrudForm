@@ -2,7 +2,7 @@ import React from 'react';
 
 const CurdOverviewTable: React.FunctionComponent = () => {
     return (
-        <div>Curd Overview</div>
+        <div style={{ marginTop: '100px' }}>Curd Overview</div>
     );
 }
 

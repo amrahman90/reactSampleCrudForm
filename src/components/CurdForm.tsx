@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Checkbox, Grid, Select, Typography, Button } from '@material-ui/core/';
 import { getRandomString } from '../Helper/HelperFunctions';
+import airports from "../airportData/airports.json";
 
 interface props {
   id?: number;
@@ -13,6 +14,8 @@ function CurdForm(props: props) {
       marginRight: '10px',
     },
   };
+
+  const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
 
   const [errorsFromValidation, setErrorsFromValidation] = useState([]);
 
@@ -48,7 +51,9 @@ function CurdForm(props: props) {
   const [isNameOfKeyHasError, setIsNameOfKeyHasError] = useState(false);
   //Use Fixed ID
   const [isFixedIdChecked, setIsFixedIdChecked] = useState(false);
-  const [fixedIdCode, setFixedIdCode] = useState('');
+  const [fixedIdCode, setFixedIdCode] = useState('DAC');
+  const [isFixedIdGotError, setIsFixedIdGotError] = useState(false);
+  const [isIATAMatched, setIsIATAMatched] = useState(true);
 
   //Header Line
 
@@ -74,10 +79,29 @@ function CurdForm(props: props) {
   const [isDNSIdChecked, setIsDNSIdChecked] = useState(false);
 
   const textFieldChange = (event: any, title: string) => {
+    const val = event.target.value;
+
     if (title === 'nameofkey') {
-      setNameOfTheKey(event.target.value);
-    } else if (title === 'usefixedid') {
-      setFixedIdCode(event.target.value);
+      setNameOfTheKey(val);
+    }
+    else if (title === 'usefixedid') {
+      setFixedIdCode(val);
+      // console.log('vall ', airports);
+
+      if (val.length === 3) {
+        setIsFixedIdGotError(false);
+
+        if (isIATACodeMatched(val).length > 0) {
+          setIsIATAMatched(true)
+        }
+        else {
+          setIsIATAMatched(false);
+        }
+        console.log('is matched ', isIATACodeMatched(val));
+      }
+      else {
+        setIsFixedIdGotError(true);
+      }
     }
   };
 
@@ -154,7 +178,7 @@ function CurdForm(props: props) {
     const invokedList = new Map();
 
     selectIdToValue.forEach((entry, key) => {
-      console.log('map', key, entry);
+      // console.log('map', key, entry);
 
       if (entry !== '0') {
         invokedList.set(entry, true);
@@ -274,6 +298,8 @@ function CurdForm(props: props) {
             value: entry,
           });
         });
+
+        return entries;
       };
 
       const jsonData = {
@@ -282,18 +308,33 @@ function CurdForm(props: props) {
         headerline: headerLine,
         separatorstyle: separatorStyle,
         numberofdata: numberOfData,
-        selectidvalue: selectIdValues,
-        numberofidincludedfields: numbersOfIdIncluded,
+        selectidvalue: selectIdValues(),
+        numberofidincludedfields: numbersOfIdIncluded(),
       };
 
+      const dataArray = [];
+      dataArray.push(jsonData);
 
-      localStorage.setItem('curdFormData', JSON.stringify(jsonData));
+
+      localStorage.setItem('curdFormData', JSON.stringify(dataArray));
     } else {
       console.log('got some errors !!!');
       // setErrorsFromValidation(errors);
       console.log(errors);
     }
   };
+
+  const isIATACodeMatched = (val: string) => airports.filter((airport, index, array) => {
+
+    const isTrue =
+      airport.IATA
+        .toLowerCase()
+        .includes(val.toLowerCase())
+        ? true
+        : false;
+
+    return isTrue;
+  });
 
   return (
     <form style={{ marginTop: '100px' }}>
@@ -337,6 +378,10 @@ function CurdForm(props: props) {
           <TextField
             onChange={(e) => textFieldChange(e, 'usefixedid')}
             disabled={isFixedIdChecked ? false : true}
+            error={(isFixedIdGotError || !isIATAMatched) && isFixedIdChecked ? true : false}
+            // helperText={isIATAMatched ? 'matched iata' : null}
+            helperText={isFixedIdGotError && isFixedIdChecked ? 'Length is less than 3' : (!isIATAMatched) && isFixedIdChecked ? 'IATA did not match' : null}
+            value={fixedIdCode}
             id="outlined-basic"
             inputProps={{
               maxLength: 3,
