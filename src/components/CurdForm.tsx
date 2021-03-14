@@ -170,6 +170,31 @@ function CurdForm(props: props) {
     } else {
       setIsDisabledDNSIdIncluded(true);
     }
+
+    // If New fabrication ID selected and fabrication id included already checked
+
+    if (selectIdToValue.has('4') && selectIdToValue.get('4') !== '0') {
+      if (!isDisabledFabricationIdIncluded && isFabricationIdChecked) {
+        setIsFabricationIdChecked(false);
+      }
+    }
+
+    // If New Serial ID selected and Serial id included already checked
+
+    if (selectIdToValue.has('3') && selectIdToValue.get('3') !== '0') {
+      if (!isDisabledSerialIdIncluded && isSerialIdChecked) {
+        setIsSerialIdChecked(false);
+      }
+    }
+
+
+    // If New DNS ID selected and DNS id included already checked
+
+    if (selectIdToValue.has('7') && selectIdToValue.get('7') !== '0') {
+      if (!isDisabledDNSIdIncluded && isDNSIdChecked) {
+        setIsDNSIdChecked(false);
+      }
+    }
   }, [selectIdToValue]);
 
   const selectOptions = (selectId: string) => {
@@ -324,7 +349,7 @@ function CurdForm(props: props) {
     }
   };
 
-  const isIATACodeMatched = (val: string) => airports.filter((airport, index, array) => {
+  const isIATACodeMatched = (val: string) => airports.filter((airport) => {
 
     const isTrue =
       airport.IATA
