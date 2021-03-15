@@ -276,8 +276,16 @@ function CurdForm(props: props) {
       errors.push('Name of Key cannot be empty');
     }
 
-    if (isFixedIdChecked && fixedIdCode === '') {
-      errors.push('Fixed ID field cannot be empty');
+    if (isFixedIdChecked) {
+
+      if (!isIATAMatched) {
+        errors.push('IATA code did not match');
+      }
+      if (fixedIdCode.length !== 3) {
+        errors.push('Fixed code Length is less than 3');
+      }
+
+
     }
 
     let numberOfActiveFields = 0;
@@ -329,17 +337,26 @@ function CurdForm(props: props) {
 
       const jsonData = {
         nameofkey: nameOfTheKey,
-        usefixedid: isFixedIdChecked ? fixedIdCode : getRandomString(3),
+        usefixedid: isFixedIdChecked ? fixedIdCode.toUpperCase() : 'DAC',
         headerline: headerLine,
         separatorstyle: separatorStyle,
         numberofdata: numberOfData,
         selectidvalue: selectIdValues(),
         numberofidincludedfields: numbersOfIdIncluded(),
+        createdAt: new Date(),
+        modifiedAt: ''
       };
 
       const dataArray = [];
       dataArray.push(jsonData);
 
+      const datafromStorage = localStorage.getItem('curdFormData');
+      const obj = JSON.parse(datafromStorage || '[]');
+
+      for (let i = 0; i < obj.length; ++i) {
+        dataArray.push(obj[i]);
+      }
+      // dataArray.push(jsonData);
 
       localStorage.setItem('curdFormData', JSON.stringify(dataArray));
     } else {
@@ -406,7 +423,7 @@ function CurdForm(props: props) {
             error={(isFixedIdGotError || !isIATAMatched) && isFixedIdChecked ? true : false}
             // helperText={isIATAMatched ? 'matched iata' : null}
             helperText={isFixedIdGotError && isFixedIdChecked ? 'Length is less than 3' : (!isIATAMatched) && isFixedIdChecked ? 'IATA did not match' : null}
-            value={fixedIdCode}
+            value={isFixedIdChecked ? fixedIdCode : 'DAC'}
             id="outlined-basic"
             inputProps={{
               maxLength: 3,
@@ -415,7 +432,7 @@ function CurdForm(props: props) {
                 if (!event.key.match(alphabetsRegex)) {
                   event.preventDefault();
                 }
-              },
+              }
             }}
             label="ID Code"
             size="small"

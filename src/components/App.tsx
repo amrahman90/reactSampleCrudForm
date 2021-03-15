@@ -10,7 +10,7 @@ const App: React.FunctionComponent = () => {
   return (
     <Router>
       <MaterialAppBar />
-      <Container maxWidth="sm">
+      <Container maxWidth="md">
         <Route
           exact path="/"
           render={(props) => (
