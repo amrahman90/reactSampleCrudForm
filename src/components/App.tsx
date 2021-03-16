@@ -4,26 +4,22 @@ import CurdForm from './CurdForm';
 import CurdOverviewTable from './CurdOverviewTable';
 import { Container } from '@material-ui/core/';
 import MaterialAppBar from './Appbar/MaterialAppBar';
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import SelectComponent from './SelectComponent';
 
 const App: React.FunctionComponent = () => {
   return (
     <Router>
       <MaterialAppBar />
       <Container maxWidth="md">
-        <Route
-          exact path="/"
-          render={(props) => (
-            <CurdForm {...props} id={1} />
-          )}
-        />
-        <Route
-          path="/details"
-          component={CurdOverviewTable}
-        />
+        <Switch>
+          <Route exact path="/" component={SelectComponent} />
+          <Route path="/form/:id?" component={CurdForm} />
+          <Route path="/details" component={CurdOverviewTable} />
+        </Switch>
       </Container>
     </Router>
-  )
+  );
 };
 
 export default App;

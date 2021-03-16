@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TextField, Checkbox, Grid, Select, Typography, Button } from '@material-ui/core/';
 import { getRandomString } from '../Helper/HelperFunctions';
-import airports from "../airportData/airports.json";
+import airports from '../airportData/airports.json';
+import { useParams } from 'react-router';
+import { Redirect, BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 
-interface props {
-  id?: number;
+
+interface ParamTypes {
+  id: string;
 }
 
-function CurdForm(props: props) {
+function CurdForm() {
   const styles = {
     inlineBlock: {
       display: 'inline-block',
@@ -15,11 +18,15 @@ function CurdForm(props: props) {
     },
   };
 
+  const [noOfRender, setNoOfRender] = useState(0);
+
   const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
 
   const [errorsFromValidation, setErrorsFromValidation] = useState([]);
 
-  const { id } = props;
+  const { id } = useParams<ParamTypes>();
+
+  console.log('iddddd ', id);
 
   const [numberOfData, setNumberOfData] = useState(6);
   const [selectIdToValue, setSelectIdToValue] = useState(new Map());
@@ -78,13 +85,72 @@ function CurdForm(props: props) {
   const [isDisabledDNSIdIncluded, setIsDisabledDNSIdIncluded] = useState(true);
   const [isDNSIdChecked, setIsDNSIdChecked] = useState(false);
 
+  // Load all data from localstorage
+
+  useEffect(() => {
+    if (id !== undefined) {
+      const datafromStorage = localStorage.getItem('curdFormData');
+      const obj = JSON.parse(datafromStorage || '[]');
+      const fetchDataFromCurrentIndex = obj[parseInt(id)];
+
+      console.log('fetch data form ', fetchDataFromCurrentIndex);
+
+      setNameOfTheKey(fetchDataFromCurrentIndex.nameofkey);
+      if (fetchDataFromCurrentIndex.usefixedid !== 'DAC') {
+        setIsFixedIdChecked(true);
+      }
+      setFixedIdCode(fetchDataFromCurrentIndex.usefixedid);
+
+      setHeaderLine(fetchDataFromCurrentIndex.headerline);
+
+      setSeparatorStyle(fetchDataFromCurrentIndex.separatorstyle);
+
+      setNumberOfData(parseInt(fetchDataFromCurrentIndex.numberofdata));
+
+
+      console.log('select id to value ', selectIdToValue);
+
+
+      //fetch data from id to value array  
+
+      for (let i = 0; i < fetchDataFromCurrentIndex.selectidvalue.length; ++i) {
+        setSelectIdToValue(
+          new Map(
+            selectIdToValue.set(
+              fetchDataFromCurrentIndex.selectidvalue[i].id,
+              fetchDataFromCurrentIndex.selectidvalue[i].value
+            )
+          )
+        );
+      }
+
+      //fetch data from include fields lookup map
+
+      for(let i = 0; i < fetchDataFromCurrentIndex.numberofidincludedfields; ++i){
+         setIncludedFieldsLookup(
+           new Map(
+             includedFieldsLookup.set(
+               fetchDataFromCurrentIndex.numberofidincludedfields[i].id,
+               fetchDataFromCurrentIndex.numberofidincludedfields[i].value
+             )
+           )
+         );
+      }
+
+      // setting up checkboxes regarding ID included
+
+      setIsFabricationIdChecked(fetchDataFromCurrentIndex.isfabricationidchecked);
+      setIsSerialIdChecked(fetchDataFromCurrentIndex.isserialidchecked);
+      setIsDNSIdChecked(fetchDataFromCurrentIndex.isdnsidchecked);
+    }
+  }, []);
+
   const textFieldChange = (event: any, title: string) => {
     const val = event.target.value;
 
     if (title === 'nameofkey') {
       setNameOfTheKey(val);
-    }
-    else if (title === 'usefixedid') {
+    } else if (title === 'usefixedid') {
       setFixedIdCode(val);
       // console.log('vall ', airports);
 
@@ -92,14 +158,12 @@ function CurdForm(props: props) {
         setIsFixedIdGotError(false);
 
         if (isIATACodeMatched(val).length > 0) {
-          setIsIATAMatched(true)
-        }
-        else {
+          setIsIATAMatched(true);
+        } else {
           setIsIATAMatched(false);
         }
         console.log('is matched ', isIATACodeMatched(val));
-      }
-      else {
+      } else {
         setIsFixedIdGotError(true);
       }
     }
@@ -187,7 +251,6 @@ function CurdForm(props: props) {
       }
     }
 
-
     // If New DNS ID selected and DNS id included already checked
 
     if (selectIdToValue.has('7') && selectIdToValue.get('7') !== '0') {
@@ -244,21 +307,20 @@ function CurdForm(props: props) {
   };
 
   useEffect(() => {
-    selectIdToValue.forEach((entry, key) => {
-      setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
-    });
-
-    setIsFabricationIdChecked(false);
-    setIsSerialIdChecked(false);
-    setIsDNSIdChecked(false);
-
-    includedFieldsLookup.forEach((entry, key) => {
-      setIncludedFieldsLookup((prev) => {
-        const newState = new Map(prev);
-        newState.delete(key);
-        return newState;
+    if (id === undefined) {
+      selectIdToValue.forEach((entry, key) => {
+        setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
       });
-    });
+    } else {
+      if (noOfRender < 2) {
+        setNoOfRender(noOfRender + 1);
+      } else {
+        selectIdToValue.forEach((entry, key) => {
+          setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
+        });
+      }
+    }
+
   }, [numberOfData]);
 
   const numberOfDataOnChangeHandler = (event: any) => {
@@ -277,15 +339,12 @@ function CurdForm(props: props) {
     }
 
     if (isFixedIdChecked) {
-
       if (!isIATAMatched) {
         errors.push('IATA code did not match');
       }
       if (fixedIdCode.length !== 3) {
         errors.push('Fixed code Length is less than 3');
       }
-
-
     }
 
     let numberOfActiveFields = 0;
@@ -343,12 +402,18 @@ function CurdForm(props: props) {
         numberofdata: numberOfData,
         selectidvalue: selectIdValues(),
         numberofidincludedfields: numbersOfIdIncluded(),
+        isfabricationidchecked: isFabricationIdChecked,
+        isserialidchecked: isSerialIdChecked,
+        isdnsidchecked: isDNSIdChecked,
         createdAt: new Date(),
-        modifiedAt: ''
+        modifiedAt: '',
       };
 
       const dataArray = [];
-      dataArray.push(jsonData);
+
+      if (id === undefined) {
+        dataArray.push(jsonData);
+      }
 
       const datafromStorage = localStorage.getItem('curdFormData');
       const obj = JSON.parse(datafromStorage || '[]');
@@ -356,6 +421,8 @@ function CurdForm(props: props) {
       for (let i = 0; i < obj.length; ++i) {
         dataArray.push(obj[i]);
       }
+
+      dataArray[parseInt(id)] = jsonData;
       // dataArray.push(jsonData);
 
       localStorage.setItem('curdFormData', JSON.stringify(dataArray));
@@ -366,17 +433,12 @@ function CurdForm(props: props) {
     }
   };
 
-  const isIATACodeMatched = (val: string) => airports.filter((airport) => {
+  const isIATACodeMatched = (val: string) =>
+    airports.filter((airport) => {
+      const isTrue = airport.IATA.toLowerCase().includes(val.toLowerCase()) ? true : false;
 
-    const isTrue =
-      airport.IATA
-        .toLowerCase()
-        .includes(val.toLowerCase())
-        ? true
-        : false;
-
-    return isTrue;
-  });
+      return isTrue;
+    });
 
   return (
     <form style={{ marginTop: '100px' }}>
@@ -422,7 +484,13 @@ function CurdForm(props: props) {
             disabled={isFixedIdChecked ? false : true}
             error={(isFixedIdGotError || !isIATAMatched) && isFixedIdChecked ? true : false}
             // helperText={isIATAMatched ? 'matched iata' : null}
-            helperText={isFixedIdGotError && isFixedIdChecked ? 'Length is less than 3' : (!isIATAMatched) && isFixedIdChecked ? 'IATA did not match' : null}
+            helperText={
+              isFixedIdGotError && isFixedIdChecked
+                ? 'Length is less than 3'
+                : !isIATAMatched && isFixedIdChecked
+                ? 'IATA did not match'
+                : null
+            }
             value={isFixedIdChecked ? fixedIdCode : 'DAC'}
             id="outlined-basic"
             inputProps={{
@@ -432,7 +500,7 @@ function CurdForm(props: props) {
                 if (!event.key.match(alphabetsRegex)) {
                   event.preventDefault();
                 }
-              }
+              },
             }}
             label="ID Code"
             size="small"
@@ -455,7 +523,8 @@ function CurdForm(props: props) {
               id="radioYes"
               name="headerLine"
               value="yes"
-              defaultChecked={true}
+              // defaultChecked={true}
+              checked={headerLine === 'yes' ? true : false}
             ></input>
             <label htmlFor="radioYes">Yes</label>
 
@@ -466,6 +535,7 @@ function CurdForm(props: props) {
               type="radio"
               id="radioNo"
               name="headerLine"
+              checked={headerLine === 'no' ? true : false}
               value="no"
             ></input>
             <label htmlFor="radioNo">No</label>
@@ -486,7 +556,8 @@ function CurdForm(props: props) {
               }}
               type="radio"
               id="a"
-              defaultChecked={true}
+              // defaultChecked={true}
+              checked={separatorStyle === 'A' ? true : false}
               name="SeparatorStyle"
               value="A"
             ></input>
@@ -500,6 +571,7 @@ function CurdForm(props: props) {
               }}
               type="radio"
               id="b"
+              checked={separatorStyle === 'B' ? true : false}
               name="SeparatorStyle"
               value="B"
             ></input>
@@ -513,6 +585,7 @@ function CurdForm(props: props) {
               }}
               type="radio"
               id="c"
+              checked={separatorStyle === 'C' ? true : false}
               name="SeparatorStyle"
               value="C"
             ></input>
@@ -527,6 +600,7 @@ function CurdForm(props: props) {
               type="radio"
               id="d"
               name="SeparatorStyle"
+              checked={separatorStyle === 'D' ? true : false}
               value="D"
             ></input>
             <label htmlFor="d">D</label>
@@ -543,7 +617,8 @@ function CurdForm(props: props) {
           <TextField
             onChange={numberOfDataOnChangeHandler}
             size="small"
-            defaultValue={6}
+            value={numberOfData}
+            // defaultValue={6}
             InputProps={{
               inputProps: {
                 min: 1,
@@ -746,9 +821,11 @@ function CurdForm(props: props) {
         </Grid>
 
         <Grid item xs={6}>
-          <Button onClick={() => ValidateAllFields()} variant="contained" color="primary">
-            Save
-          </Button>
+          <Link onClick={() => ValidateAllFields()} to="/details">
+            <Button variant="contained" color="primary">
+              Save
+            </Button>
+          </Link>
         </Grid>
 
         <Grid item xs={6}>
