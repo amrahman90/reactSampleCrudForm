@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TextField, Checkbox, Grid, Select, Typography, Button } from '@material-ui/core/';
-import { getRandomString } from '../Helper/HelperFunctions';
 import airports from '../airportData/airports.json';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -14,13 +13,7 @@ interface ParamTypes {
 
 const scrollToRef = (ref: any) => window.scrollTo(0, ref.current.offsetTop);
 
-function CurdForm() {
-  const styles = {
-    inlineBlock: {
-      display: 'inline-block',
-      marginRight: '10px',
-    },
-  };
+const CurdForm: React.FunctionComponent = () => {
 
   const myRef = useRef(null);
   const executeScroll = () => scrollToRef(myRef);
@@ -29,11 +22,8 @@ function CurdForm() {
 
   const [formErrors, setFormErrors] = useState<string[]>([]);
 
-  const [errorsFromValidation, setErrorsFromValidation] = useState([]);
 
   const { id } = useParams<ParamTypes>();
-
-  console.log('iddddd ', id);
 
   const [numberOfData, setNumberOfData] = useState(6);
   const [selectIdToValue, setSelectIdToValue] = useState(new Map());
