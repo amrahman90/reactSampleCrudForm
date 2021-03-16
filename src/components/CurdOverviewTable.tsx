@@ -9,17 +9,18 @@ import Paper from "@material-ui/core/Paper";
 import SearchBar from "material-ui-search-bar";
 import EditIcon from "@material-ui/icons/Edit";
 import TrashIcon from "@material-ui/icons/Delete";
+import { Link } from 'react-router-dom';
 
-interface food {
+interface dataTable {
     nameofkey: string;
     createdAt: string;
     modifiedAt: string;
 }
 
-let originalRows: food[] = [];
+let originalRows: dataTable[] = [];
 
 export default function CurdOverviewTable() {
-    const [rows, setRows] = useState<food[]>(originalRows);
+    const [rows, setRows] = useState<dataTable[]>(originalRows);
     const [searched, setSearched] = useState<string>("");
     const items = localStorage.getItem('curdFormData');
     const [currentDeleteIndex, setDeleteIndex] = useState(-1);
@@ -116,7 +117,9 @@ export default function CurdOverviewTable() {
                                     <TableCell align="right">{row.createdAt}</TableCell>
                                     <TableCell align="right">{row.modifiedAt}</TableCell>
                                     <TableCell align="right">
-                                        <EditIcon />
+                                        <Link style={{ textDecoration: 'none', color: '#000' }} to={`/form/${index}`}>
+                                            <EditIcon />
+                                        </Link>
                                     </TableCell>
                                     <TableCell align="right">
                                         <TrashIcon onClick={() => handleRemove(index)} />

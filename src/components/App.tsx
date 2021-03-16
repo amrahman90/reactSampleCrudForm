@@ -5,7 +5,7 @@ import CurdOverviewTable from './CurdOverviewTable';
 import { Container } from '@material-ui/core/';
 import MaterialAppBar from './Appbar/MaterialAppBar';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import SelectComponent from './SelectComponent';
+import Home from './Home';
 
 const App: React.FunctionComponent = () => {
   return (
@@ -13,7 +13,7 @@ const App: React.FunctionComponent = () => {
       <MaterialAppBar />
       <Container maxWidth="md">
         <Switch>
-          <Route exact path="/" component={SelectComponent} />
+          <Route exact path="/" component={Home} />
           <Route path="/form/:id?" component={CurdForm} />
           <Route path="/details" component={CurdOverviewTable} />
         </Switch>

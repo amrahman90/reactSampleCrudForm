@@ -3,12 +3,16 @@ import { TextField, Checkbox, Grid, Select, Typography, Button } from '@material
 import { getRandomString } from '../Helper/HelperFunctions';
 import airports from '../airportData/airports.json';
 import { useParams } from 'react-router';
-import { Redirect, BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 interface ParamTypes {
   id: string;
 }
+
+// let formErrors: string[] = [];
+
+const scrollToRef = (ref: any) => window.scrollTo(0, ref.current.offsetTop);
 
 function CurdForm() {
   const styles = {
@@ -18,9 +22,12 @@ function CurdForm() {
     },
   };
 
+  const myRef = useRef(null);
+  const executeScroll = () => scrollToRef(myRef);
+
   const [noOfRender, setNoOfRender] = useState(0);
 
-  const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
   const [errorsFromValidation, setErrorsFromValidation] = useState([]);
 
@@ -126,15 +133,15 @@ function CurdForm() {
 
       //fetch data from include fields lookup map
 
-      for(let i = 0; i < fetchDataFromCurrentIndex.numberofidincludedfields; ++i){
-         setIncludedFieldsLookup(
-           new Map(
-             includedFieldsLookup.set(
-               fetchDataFromCurrentIndex.numberofidincludedfields[i].id,
-               fetchDataFromCurrentIndex.numberofidincludedfields[i].value
-             )
-           )
-         );
+      for (let i = 0; i < fetchDataFromCurrentIndex.numberofidincludedfields; ++i) {
+        setIncludedFieldsLookup(
+          new Map(
+            includedFieldsLookup.set(
+              fetchDataFromCurrentIndex.numberofidincludedfields[i].id,
+              fetchDataFromCurrentIndex.numberofidincludedfields[i].value
+            )
+          )
+        );
       }
 
       // setting up checkboxes regarding ID included
@@ -332,7 +339,7 @@ function CurdForm() {
   };
 
   const ValidateAllFields = () => {
-    const errors = [];
+    const errors: string[] = [];
 
     if (nameOfTheKey === '') {
       errors.push('Name of Key cannot be empty');
@@ -406,7 +413,7 @@ function CurdForm() {
         isserialidchecked: isSerialIdChecked,
         isdnsidchecked: isDNSIdChecked,
         createdAt: new Date(),
-        modifiedAt: '',
+        modifiedAt: id !== undefined ? new Date() : '',
       };
 
       const dataArray = [];
@@ -426,10 +433,15 @@ function CurdForm() {
       // dataArray.push(jsonData);
 
       localStorage.setItem('curdFormData', JSON.stringify(dataArray));
+
+      window.location.href = "/details";
+
     } else {
       console.log('got some errors !!!');
-      // setErrorsFromValidation(errors);
+      setFormErrors(errors);
+      // formErrors = errors;
       console.log(errors);
+      executeScroll();
     }
   };
 
@@ -488,8 +500,8 @@ function CurdForm() {
               isFixedIdGotError && isFixedIdChecked
                 ? 'Length is less than 3'
                 : !isIATAMatched && isFixedIdChecked
-                ? 'IATA did not match'
-                : null
+                  ? 'IATA did not match'
+                  : null
             }
             value={isFixedIdChecked ? fixedIdCode : 'DAC'}
             id="outlined-basic"
@@ -821,22 +833,28 @@ function CurdForm() {
         </Grid>
 
         <Grid item xs={6}>
-          <Link onClick={() => ValidateAllFields()} to="/details">
-            <Button variant="contained" color="primary">
-              Save
-            </Button>
-          </Link>
+
+          <Button onClick={() => ValidateAllFields()} variant="contained" color="primary">
+            Save
+          </Button>
         </Grid>
 
         <Grid item xs={6}>
-          <Button variant="contained" color="primary">
-            Cancel
+          <Link to="/">
+            <Button variant="contained" color="primary">
+              Cancel
           </Button>
+          </Link>
+
         </Grid>
       </Grid>
 
       <Grid item xs={12}>
-        {errorsFromValidation}
+        {
+          formErrors.map((data, index) => {
+            return <p style={{ color: 'red' }} key={index}>{data}</p>
+          })
+        }
       </Grid>
     </form>
   );
