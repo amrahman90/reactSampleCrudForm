@@ -9,8 +9,6 @@ interface ParamTypes {
   id: string;
 }
 
-// let formErrors: string[] = [];
-
 const scrollToRef = (ref: any) => window.scrollTo(0, ref.current.offsetTop);
 
 const CurdForm: React.FunctionComponent = () => {
@@ -52,7 +50,7 @@ const CurdForm: React.FunctionComponent = () => {
 
   // Name of the key
   const [nameOfTheKey, setNameOfTheKey] = useState('');
-  const [isNameOfKeyHasError, setIsNameOfKeyHasError] = useState(false);
+  // const [isNameOfKeyHasError, setIsNameOfKeyHasError] = useState(false);
   //Use Fixed ID
   const [isFixedIdChecked, setIsFixedIdChecked] = useState(false);
   const [fixedIdCode, setFixedIdCode] = useState('DAC');
@@ -444,6 +442,7 @@ const CurdForm: React.FunctionComponent = () => {
 
   return (
     <form style={{ marginTop: '100px' }}>
+      <p>Test..</p>
       <Grid container spacing={3}>
         <Grid item xs={3}>
           <Typography>Name of the key</Typography>
@@ -452,7 +451,7 @@ const CurdForm: React.FunctionComponent = () => {
           <TextField
             value={nameOfTheKey}
             onChange={(e) => textFieldChange(e, 'nameofkey')}
-            error={isNameOfKeyHasError}
+            // error={isNameOfKeyHasError}
             InputProps={{
               inputProps: {
                 maxLength: 10,
@@ -465,7 +464,7 @@ const CurdForm: React.FunctionComponent = () => {
             }}
             id="outlined-basic"
             label={'Name of the key'}
-            helperText={isNameOfKeyHasError ? 'Cannot be empty' : null}
+            // helperText={isNameOfKeyHasError ? 'Cannot be empty' : null}
             size="small"
           />
         </Grid>
