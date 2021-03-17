@@ -3,6 +3,7 @@ import { TextField, Checkbox, Grid, Select, Typography, Button } from '@material
 import airports from '../airportData/airports.json';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
+import { getDataFromLocalStorage, setDataToLocalStorage } from '../Helper/HelperFunctions';
 
 
 interface ParamTypes {
@@ -410,7 +411,8 @@ const CurdForm: React.FunctionComponent = () => {
         dataArray.push(jsonData);
       }
 
-      const datafromStorage = localStorage.getItem('curdFormData');
+      const datafromStorage = getDataFromLocalStorage('curdFormData');
+
       const obj = JSON.parse(datafromStorage || '[]');
 
       for (let i = 0; i < obj.length; ++i) {
@@ -420,7 +422,8 @@ const CurdForm: React.FunctionComponent = () => {
       dataArray[parseInt(id)] = jsonData;
       // dataArray.push(jsonData);
 
-      localStorage.setItem('curdFormData', JSON.stringify(dataArray));
+      // localStorage.setItem('curdFormData', JSON.stringify(dataArray));
+      setDataToLocalStorage('curdFormData', dataArray);
 
       window.location.href = "/details";
 
@@ -442,7 +445,6 @@ const CurdForm: React.FunctionComponent = () => {
 
   return (
     <form style={{ marginTop: '100px' }}>
-      <p>Test..</p>
       <Grid container spacing={3}>
         <Grid item xs={3}>
           <Typography>Name of the key</Typography>

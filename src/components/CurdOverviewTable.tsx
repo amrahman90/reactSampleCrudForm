@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getDataFromLocalStorage } from '../Helper/HelperFunctions';
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -22,7 +23,8 @@ let originalRows: dataTable[] = [];
 export default function CurdOverviewTable() {
     const [rows, setRows] = useState<dataTable[]>(originalRows);
     const [searched, setSearched] = useState<string>("");
-    const items = localStorage.getItem('curdFormData');
+    // const items = localStorage.getItem('curdFormData');
+    const items = getDataFromLocalStorage('curdFormData');
     const [currentDeleteIndex, setDeleteIndex] = useState(-1);
     const [isDeleteButtonClicked, setIsDeleteButtonClicked] = useState(false);
 
