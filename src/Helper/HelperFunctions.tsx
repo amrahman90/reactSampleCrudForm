@@ -1,4 +1,4 @@
-function getRandomString(length: number) {
+const getRandomString = (length: number): string => {
   const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let result = '';
   for (let i = 0; i < length; i++) {
@@ -7,12 +7,12 @@ function getRandomString(length: number) {
   return result;
 }
 
-function getDataFromLocalStorage(key: string) {
+const getDataFromLocalStorage = (key: string): string | null => {
   const items = localStorage.getItem(key);
   return items;
 }
 
-function setDataToLocalStorage(key: string, data: Array<[]>) {
+const setDataToLocalStorage = (key: string, data: Array<[]>): void => {
   localStorage.setItem(key, JSON.stringify(data));
 }
 

@@ -4,6 +4,16 @@ import airports from '../airportData/airports.json';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { getDataFromLocalStorage, setDataToLocalStorage } from '../Helper/HelperFunctions';
+import {
+  idZero,
+  idOne,
+  idTwo,
+  idThree,
+  idFour,
+  idFive,
+  idSix,
+  idSeven
+} from '../Helper/IdNumbers';
 
 interface ParamTypes {
   id: string;
@@ -167,10 +177,10 @@ const CurdForm: React.FunctionComponent = () => {
 
   useEffect(() => {
     if (isFabricationIdChecked) {
-      addKeyToIncludedFieldsLookup('1', '1', '4');
-      setSelectIdToValue(new Map(selectIdToValue.set('4', '0')));
+      addKeyToIncludedFieldsLookup(idOne, idOne, idFour);
+      setSelectIdToValue(new Map(selectIdToValue.set(idFour, idZero)));
     } else {
-      deleteKeyFromIncludedFieldsLookup('1');
+      deleteKeyFromIncludedFieldsLookup(idOne);
     }
   }, [isFabricationIdChecked]);
 
@@ -178,10 +188,10 @@ const CurdForm: React.FunctionComponent = () => {
 
   useEffect(() => {
     if (isSerialIdChecked) {
-      addKeyToIncludedFieldsLookup('2', '2', '3');
-      setSelectIdToValue(new Map(selectIdToValue.set('3', '0')));
+      addKeyToIncludedFieldsLookup(idTwo, idTwo, idThree);
+      setSelectIdToValue(new Map(selectIdToValue.set(idThree, idZero)));
     } else {
-      deleteKeyFromIncludedFieldsLookup('2');
+      deleteKeyFromIncludedFieldsLookup(idTwo);
     }
   }, [isSerialIdChecked]);
 
@@ -189,17 +199,17 @@ const CurdForm: React.FunctionComponent = () => {
 
   useEffect(() => {
     if (isDNSIdChecked) {
-      addKeyToIncludedFieldsLookup('3', '5', '7');
-      setSelectIdToValue(new Map(selectIdToValue.set('7', '0')));
+      addKeyToIncludedFieldsLookup(idThree, idFive, idSeven);
+      setSelectIdToValue(new Map(selectIdToValue.set(idSeven, idZero)));
     } else {
-      deleteKeyFromIncludedFieldsLookup('3');
+      deleteKeyFromIncludedFieldsLookup(idThree);
     }
   }, [isDNSIdChecked]);
 
   //When fabrication ID has got changed
 
   useEffect(() => {
-    if (selectIdToValue.has('1') && selectIdToValue.get('1') !== '0') {
+    if (selectIdToValue.has(idOne) && selectIdToValue.get(idOne) !== idZero) {
       setIsDisabledFabricationIdIncluded(false);
     } else {
       setIsDisabledFabricationIdIncluded(true);
@@ -207,7 +217,7 @@ const CurdForm: React.FunctionComponent = () => {
 
     // When serial ID has got changed
 
-    if (selectIdToValue.has('2') && selectIdToValue.get('2') !== '0') {
+    if (selectIdToValue.has(idTwo) && selectIdToValue.get(idTwo) !== idZero) {
       setIsDisabledSerialIdIncluded(false);
     } else {
       setIsDisabledSerialIdIncluded(true);
@@ -215,7 +225,7 @@ const CurdForm: React.FunctionComponent = () => {
 
     //When DNS ID has got changed
 
-    if (selectIdToValue.has('5') && selectIdToValue.get('5') !== '0') {
+    if (selectIdToValue.has(idFive) && selectIdToValue.get(idFive) !== idZero) {
       setIsDisabledDNSIdIncluded(false);
     } else {
       setIsDisabledDNSIdIncluded(true);
@@ -223,7 +233,7 @@ const CurdForm: React.FunctionComponent = () => {
 
     // If New fabrication ID selected and fabrication id included already checked
 
-    if (selectIdToValue.has('4') && selectIdToValue.get('4') !== '0') {
+    if (selectIdToValue.has(idFour) && selectIdToValue.get(idFour) !== idZero) {
       if (!isDisabledFabricationIdIncluded && isFabricationIdChecked) {
         setIsFabricationIdChecked(false);
       }
@@ -231,7 +241,7 @@ const CurdForm: React.FunctionComponent = () => {
 
     // If New Serial ID selected and Serial id included already checked
 
-    if (selectIdToValue.has('3') && selectIdToValue.get('3') !== '0') {
+    if (selectIdToValue.has(idThree) && selectIdToValue.get(idThree) !== idZero) {
       if (!isDisabledSerialIdIncluded && isSerialIdChecked) {
         setIsSerialIdChecked(false);
       }
@@ -239,7 +249,7 @@ const CurdForm: React.FunctionComponent = () => {
 
     // If New DNS ID selected and DNS id included already checked
 
-    if (selectIdToValue.has('7') && selectIdToValue.get('7') !== '0') {
+    if (selectIdToValue.has(idSeven) && selectIdToValue.get(idSeven) !== idZero) {
       if (!isDisabledDNSIdIncluded && isDNSIdChecked) {
         setIsDNSIdChecked(false);
       }
@@ -253,10 +263,10 @@ const CurdForm: React.FunctionComponent = () => {
     const availableOptions = [];
     const invokedList = new Map();
 
-    selectIdToValue.forEach((entry, key) => {
+    selectIdToValue.forEach((entry) => {
       // console.log('map', key, entry);
 
-      if (entry !== '0') {
+      if (entry !== idZero) {
         invokedList.set(entry, true);
       }
     });
@@ -268,14 +278,12 @@ const CurdForm: React.FunctionComponent = () => {
     }
 
     if (selectIdToValue.has(selectId)) {
-      if (selectIdToValue.get(selectId) !== '0') {
+      if (selectIdToValue.get(selectId) !== idZero) {
         availableOptions.push(parseInt(selectIdToValue.get(selectId)));
       }
     }
 
     availableOptions.sort();
-
-    // console.log('availableOptions ', availableOptions);
 
     options.push(
       <option key={0} value={0}>
@@ -297,14 +305,14 @@ const CurdForm: React.FunctionComponent = () => {
   useEffect(() => {
     if (id === undefined) {
       selectIdToValue.forEach((entry, key) => {
-        setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
+        setSelectIdToValue(new Map(selectIdToValue.set(key, idZero)));
       });
     } else {
       if (noOfRender < 2) {
         setNoOfRender(noOfRender + 1);
       } else {
         selectIdToValue.forEach((entry, key) => {
-          setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
+          setSelectIdToValue(new Map(selectIdToValue.set(key, idZero)));
         });
       }
     }
@@ -314,7 +322,7 @@ const CurdForm: React.FunctionComponent = () => {
     setNumberOfData(event.target.value);
 
     // selectIdToValue.forEach((entry, key) => {
-    //   setSelectIdToValue(new Map(selectIdToValue.set(key, '0')));
+    //   setSelectIdToValue(new Map(selectIdToValue.set(key, idZero)));
     // });
   };
 
@@ -337,7 +345,7 @@ const CurdForm: React.FunctionComponent = () => {
     let numberOfActiveFields = 0;
 
     selectIdToValue.forEach((value, id) => {
-      if (value !== '0') {
+      if (value !== idZero) {
         numberOfActiveFields++;
       }
 
@@ -480,8 +488,8 @@ const CurdForm: React.FunctionComponent = () => {
               isFixedIdGotError && isFixedIdChecked
                 ? 'Length is less than 3'
                 : !isIATAMatched && isFixedIdChecked
-                ? 'IATA did not match'
-                : null
+                  ? 'IATA did not match'
+                  : null
             }
             value={isFixedIdChecked ? fixedIdCode : 'DAC'}
             id="outlined-basic"
@@ -635,14 +643,14 @@ const CurdForm: React.FunctionComponent = () => {
             native
             id="select-one"
             defaultValue={'None'}
-            value={selectIdToValue.get('1')}
-            onChange={(e) => selectOnChangeHandler(e, '1')}
+            value={selectIdToValue.get(idOne)}
+            onChange={(e) => selectOnChangeHandler(e, idOne)}
             inputProps={{
-              name: '1',
-              id: '1',
+              name: idOne,
+              id: idOne,
             }}
           >
-            {selectOptions('1')}
+            {selectOptions(idOne)}
           </Select>
         </Grid>
 
@@ -671,14 +679,14 @@ const CurdForm: React.FunctionComponent = () => {
             native
             id="select-two"
             defaultValue={'None'}
-            value={selectIdToValue.get('2')}
-            onChange={(e) => selectOnChangeHandler(e, '2')}
+            value={selectIdToValue.get(idTwo)}
+            onChange={(e) => selectOnChangeHandler(e, idTwo)}
             inputProps={{
-              name: '2',
-              id: '2',
+              name: idTwo,
+              id: idTwo,
             }}
           >
-            {selectOptions('2')}
+            {selectOptions(idTwo)}
           </Select>
         </Grid>
 
@@ -706,14 +714,14 @@ const CurdForm: React.FunctionComponent = () => {
           <Select
             native
             defaultValue={'None'}
-            value={selectIdToValue.get('3')}
-            onChange={(e) => selectOnChangeHandler(e, '3')}
+            value={selectIdToValue.get(idThree)}
+            onChange={(e) => selectOnChangeHandler(e, idThree)}
             inputProps={{
-              name: '3',
-              id: '3',
+              name: idThree,
+              id: idThree,
             }}
           >
-            {selectOptions('3')}
+            {selectOptions(idThree)}
           </Select>
         </Grid>
 
@@ -726,14 +734,14 @@ const CurdForm: React.FunctionComponent = () => {
           <Select
             native
             defaultValue={'None'}
-            value={selectIdToValue.get('4')}
-            onChange={(e) => selectOnChangeHandler(e, '4')}
+            value={selectIdToValue.get(idFour)}
+            onChange={(e) => selectOnChangeHandler(e, idFour)}
             inputProps={{
-              name: '4',
-              id: '4',
+              name: idFour,
+              id: idFour,
             }}
           >
-            {selectOptions('4')}
+            {selectOptions(idFour)}
           </Select>
         </Grid>
 
@@ -747,14 +755,14 @@ const CurdForm: React.FunctionComponent = () => {
           <Select
             native
             defaultValue={'None'}
-            value={selectIdToValue.get('5')}
-            onChange={(e) => selectOnChangeHandler(e, '5')}
+            value={selectIdToValue.get(idFive)}
+            onChange={(e) => selectOnChangeHandler(e, idFive)}
             inputProps={{
-              name: '5',
-              id: '5',
+              name: idFive,
+              id: idFive,
             }}
           >
-            {selectOptions('5')}
+            {selectOptions(idFive)}
           </Select>
         </Grid>
 
@@ -782,14 +790,14 @@ const CurdForm: React.FunctionComponent = () => {
           <Select
             native
             defaultValue={'None'}
-            value={selectIdToValue.get('6')}
-            onChange={(e) => selectOnChangeHandler(e, '6')}
+            value={selectIdToValue.get(idSix)}
+            onChange={(e) => selectOnChangeHandler(e, idSix)}
             inputProps={{
-              name: '6',
-              id: '6',
+              name: idSix,
+              id: idSix,
             }}
           >
-            {selectOptions('6')}
+            {selectOptions(idSix)}
           </Select>
         </Grid>
 
@@ -803,14 +811,14 @@ const CurdForm: React.FunctionComponent = () => {
           <Select
             native
             defaultValue={'None'}
-            value={selectIdToValue.get('7')}
-            onChange={(e) => selectOnChangeHandler(e, '7')}
+            value={selectIdToValue.get(idSeven)}
+            onChange={(e) => selectOnChangeHandler(e, idSeven)}
             inputProps={{
-              name: '7',
-              id: '7',
+              name: idSeven,
+              id: idSeven,
             }}
           >
-            {selectOptions('7')}
+            {selectOptions(idSeven)}
           </Select>
         </Grid>
 
