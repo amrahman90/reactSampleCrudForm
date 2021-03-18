@@ -12,6 +12,12 @@ import EditIcon from "@material-ui/icons/Edit";
 import TrashIcon from "@material-ui/icons/Delete";
 import { Link } from 'react-router-dom';
 
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
+
 interface dataTable {
     nameofkey: string;
     createdAt: string;
@@ -23,10 +29,13 @@ let originalRows: dataTable[] = [];
 export default function CurdOverviewTable() {
     const [rows, setRows] = useState<dataTable[]>(originalRows);
     const [searched, setSearched] = useState<string>("");
-    // const items = localStorage.getItem('curdFormData');
     const items = getDataFromLocalStorage('curdFormData');
     const [currentDeleteIndex, setDeleteIndex] = useState(-1);
     const [isDeleteButtonClicked, setIsDeleteButtonClicked] = useState(false);
+    const [isOpen, setIsOpen] = useState([
+        { open: false },
+        { open: false }
+    ]);
 
     useEffect(() => {
         const obj = JSON.parse(items || '{}');
@@ -86,9 +95,52 @@ export default function CurdOverviewTable() {
         requestSearch(searched);
     };
 
+    const popUpStateDataHandler = (index: number, status: boolean) => {
+        const values = [...isOpen];
+        values[index].open = status;
+        setIsOpen(values);
+    }
+
     const handleRemove = (index: number) => {
         setIsDeleteButtonClicked(!isDeleteButtonClicked);
         setDeleteIndex(index);
+
+        popUpStateDataHandler(index, false);
+
+    }
+
+    const handleClose = (index: number) => {
+        popUpStateDataHandler(index, false);
+    }
+
+    const dialogPopUpHandler = (index: number) => {
+        popUpStateDataHandler(index, true);
+    }
+
+    const dialogPopUp = (index: number) => {
+        return (
+            <Dialog
+                open={isOpen[index].open}
+                onClick={() => handleClose(index)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Do you want to delete?"}</DialogTitle>
+                <DialogActions>
+                    <Button
+                        onClick={() => handleClose(index)}
+                        color="primary">
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => handleRemove(index)}
+                        color="primary" autoFocus>
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+        );
     }
 
     return (
@@ -124,7 +176,10 @@ export default function CurdOverviewTable() {
                                         </Link>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <TrashIcon onClick={() => handleRemove(index)} />
+                                        {/* <TrashIcon onClick={() => handleRemove(index)} /> */}
+                                        {dialogPopUp(index)}
+                                        <TrashIcon onClick={() => dialogPopUpHandler(index)} />
+
                                     </TableCell>
 
                                 </TableRow>
