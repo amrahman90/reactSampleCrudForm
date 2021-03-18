@@ -5,22 +5,14 @@ import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { getDataFromLocalStorage, setDataToLocalStorage } from '../Helper/HelperFunctions';
 
-
 interface ParamTypes {
   id: string;
 }
 
-const scrollToRef = (ref: any) => window.scrollTo(0, ref.current.offsetTop);
-
 const CurdForm: React.FunctionComponent = () => {
-
-  const myRef = useRef(null);
-  const executeScroll = () => scrollToRef(myRef);
-
   const [noOfRender, setNoOfRender] = useState(0);
 
   const [formErrors, setFormErrors] = useState<string[]>([]);
-
 
   const { id } = useParams<ParamTypes>();
 
@@ -103,11 +95,9 @@ const CurdForm: React.FunctionComponent = () => {
 
       setNumberOfData(parseInt(fetchDataFromCurrentIndex.numberofdata));
 
-
       console.log('select id to value ', selectIdToValue);
 
-
-      //fetch data from id to value array  
+      //fetch data from id to value array
 
       for (let i = 0; i < fetchDataFromCurrentIndex.selectidvalue.length; ++i) {
         setSelectIdToValue(
@@ -256,7 +246,9 @@ const CurdForm: React.FunctionComponent = () => {
     }
   }, [selectIdToValue]);
 
+
   const selectOptions = (selectId: string) => {
+
     const options = [];
     const availableOptions = [];
     const invokedList = new Map();
@@ -316,7 +308,6 @@ const CurdForm: React.FunctionComponent = () => {
         });
       }
     }
-
   }, [numberOfData]);
 
   const numberOfDataOnChangeHandler = (event: any) => {
@@ -425,14 +416,12 @@ const CurdForm: React.FunctionComponent = () => {
       // localStorage.setItem('curdFormData', JSON.stringify(dataArray));
       setDataToLocalStorage('curdFormData', dataArray);
 
-      window.location.href = "/details";
-
+      window.location.href = '/details';
     } else {
       console.log('got some errors !!!');
       setFormErrors(errors);
       // formErrors = errors;
       console.log(errors);
-      executeScroll();
     }
   };
 
@@ -451,6 +440,7 @@ const CurdForm: React.FunctionComponent = () => {
         </Grid>
         <Grid item xs={9}>
           <TextField
+            id="name-of-key"
             value={nameOfTheKey}
             onChange={(e) => textFieldChange(e, 'nameofkey')}
             // error={isNameOfKeyHasError}
@@ -464,7 +454,6 @@ const CurdForm: React.FunctionComponent = () => {
                 },
               },
             }}
-            id="outlined-basic"
             label={'Name of the key'}
             // helperText={isNameOfKeyHasError ? 'Cannot be empty' : null}
             size="small"
@@ -491,8 +480,8 @@ const CurdForm: React.FunctionComponent = () => {
               isFixedIdGotError && isFixedIdChecked
                 ? 'Length is less than 3'
                 : !isIATAMatched && isFixedIdChecked
-                  ? 'IATA did not match'
-                  : null
+                ? 'IATA did not match'
+                : null
             }
             value={isFixedIdChecked ? fixedIdCode : 'DAC'}
             id="outlined-basic"
@@ -644,6 +633,7 @@ const CurdForm: React.FunctionComponent = () => {
         <Grid item xs={3}>
           <Select
             native
+            id="select-one"
             defaultValue={'None'}
             value={selectIdToValue.get('1')}
             onChange={(e) => selectOnChangeHandler(e, '1')}
@@ -679,6 +669,7 @@ const CurdForm: React.FunctionComponent = () => {
         <Grid item xs={3}>
           <Select
             native
+            id="select-two"
             defaultValue={'None'}
             value={selectIdToValue.get('2')}
             onChange={(e) => selectOnChangeHandler(e, '2')}
@@ -824,8 +815,7 @@ const CurdForm: React.FunctionComponent = () => {
         </Grid>
 
         <Grid item xs={6}>
-
-          <Button onClick={() => ValidateAllFields()} variant="contained" color="primary">
+          <Button id="save-button" onClick={() => ValidateAllFields()} variant="contained" color="primary">
             Save
           </Button>
         </Grid>
@@ -834,21 +824,22 @@ const CurdForm: React.FunctionComponent = () => {
           <Link to="/">
             <Button variant="contained" color="primary">
               Cancel
-          </Button>
+            </Button>
           </Link>
-
         </Grid>
       </Grid>
 
-      <Grid item xs={12}>
-        {
-          formErrors.map((data, index) => {
-            return <p style={{ color: 'red' }} key={index}>{data}</p>
-          })
-        }
+      <Grid id="error-grid" item xs={12}>
+        {formErrors.map((data, index) => {
+          return (
+            <p id={`error-text${index}`} style={{ color: 'red' }} key={index}>
+              {data}
+            </p>
+          );
+        })}
       </Grid>
     </form>
   );
-}
+};
 
 export default CurdForm;
